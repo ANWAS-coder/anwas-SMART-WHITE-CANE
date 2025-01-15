@@ -4,14 +4,14 @@
 const int trigPin = 5;     
 const int echoPin = 4;     
 
-MPU6050 mpu;                      
+MPU6050 mpu;  //gyro                   
 
-int VM1 = A1;  
+int VM1 = A1;  //ตัวสั่น
 
-unsigned long previousMillis = 0;   
-const long interval = 1000;         
+unsigned long previousMillis = 0;  //เก็บค่าเลยวินาทีจาก ultrasonic แล้วเปลี่ยนเป็นเมตร
+const long interval = 1000;  //เว้นเพื่อให้ข้อมูลไม่รัวเกินไป
 
-const int buzzerPin = 9; 
+const int buzzerPin = 9;  //ตัวร้อง
 
 int melody[] = {
   1000, 500, 
@@ -22,15 +22,15 @@ int melody[] = {
   1500, 500  
 };
 
-int noteDuration = 10000; 
-int pauseDuration = 10;    
+int noteDuration = 10000;  //ร้องไป 10 วิ
+int pauseDuration = 10;  //หยุดไป 0.01 วิ
 
 void setup() {
   pinMode(VM1, OUTPUT);
   Serial.begin(9600);      
-  Wire.begin();            
+  Wire.begin();  
 
-  mpu.initialize();        
+  mpu.initialize();  //เปิดเครื่องไจโร
 
   if(mpu.testConnection()) {
     Serial.println("MPU6050 connected successfully");
@@ -39,14 +39,13 @@ void setup() {
     while(1); 
   }
 
-  mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_2000); 
+  mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_2000);  //ตั้งว่า mpu คือแค่ gyro ไม่ต้องทำอย่างอื่น
 
   pinMode(trigPin, OUTPUT);    
   pinMode(echoPin, INPUT);     
-  
   pinMode(buzzerPin, OUTPUT);  
-
-  vibrateMotorsTwice();
+  //ตั้ง ultrasonic
+  vibrateMotorsTwice();  
 }
 
 void loop() {
@@ -60,16 +59,16 @@ void loop() {
   duration = pulseIn(echoPin, HIGH);
   cm = microsecondsToCentimeters(duration);
 
-  int16_t ax, ay, az;
-  int16_t gx, gy, gz;
-  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  int16_t ax, ay, az;  //อ่านค่าองศาจากไจโร
+  int16_t gx, gy, gz;  //วัดเวลาหมุนเร็วแค่ไหน
+  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);  //รับค่าเอาไปใช้
 
-  long acceleration = sqrt(sq(ax) + sq(ay) + sq(az));
-  long gyro = sqrt(sq(gx) + sq(gy) + sq(gz));
+  long acceleration = sqrt(sq(ax) + sq(ay) + sq(az));  //คำนวณอัตราเร็ว
+  long gyro = sqrt(sq(gx) + sq(gy) + sq(gz));  //คำนวณองศา
 
   
-  float pitch = atan2(ay, az) * 180 / PI;
-  float roll = atan2(ax, az) * 180 / PI;
+  float pitch = atan2(ay, az) * 180 / PI;  //คำนวณจาก radien เป็นองศา หน้าหลัง
+  float roll = atan2(ax, az) * 180 / PI;  //คำนวณจาก radien เป็นองศา ซ้ายขวา
 
   Serial.print("ระยะทางจาก HC-SR04: ");
     Serial.print(cm);
@@ -106,7 +105,7 @@ void vibrateMotorsTwice() {
     delay(500); 
   }
 }
-
+//สั่น 2 ครั้ง ตอนเปิดเครื่อง
 long microsecondsToCentimeters(long microseconds) {
   return microseconds / 29 / 2;
 }
